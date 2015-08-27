@@ -1,14 +1,7 @@
 package org.alekhyannikhil;
 
-public class ParkingLotManagers {
+public interface ParkingLotManagers {
 
-    private boolean parkingFull;
+    public void notifyParkingFull();
 
-    public boolean isParkingFull() {
-        return parkingFull;
-    }
-
-    public void notifyParkingFull() {
-        parkingFull = true;
-    }
 }

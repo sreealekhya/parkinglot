@@ -1,26 +1,25 @@
 package org.alekhyannikhil;
 
-import java.util.List;
 import java.util.Map;
 
 public class ParkingLot {
     private int size;
     private Map<Integer,Car> slots;
-    private List<ParkingLotManagers> parkingLotManagers;
+    private ParkingLotOwner owner;
 
-    public ParkingLot(int size, Map slots, List<ParkingLotManagers> parkingLotManagers) {
+    public ParkingLot(int size, Map slots, ParkingLotOwner owner) {
         this.size = size;
         this.slots = slots;
-        this.parkingLotManagers = parkingLotManagers;
+        this.owner = owner;
     }
 
 
-    public boolean park(Car car)  {
+    public Object park(Car car)  {
         if(car != null){
         if(slots.size()<size)
         {
             if(slots.containsValue(car))
-                return false;
+                throw new SameCarCannotBeParkedAgainException("Car Already Parked");
             for(int i=1;i<=10;i++)
             {
                 if(!slots.containsKey(i))
@@ -28,26 +27,34 @@ public class ParkingLot {
                     slots.put(i,car);
                     if(size == slots.size())
                     {
-                        for(ParkingLotManagers parkingLotManager : parkingLotManagers)
-                        {
-                            parkingLotManager.notifyParkingFull();
-                        }
+                            owner.notifyParkingFull();
                     }
-                    return true;
+                    return i;
                 }
             }
         }
+        throw new ParkingFullException("ParkingLot is Full");
        }
-       return false;
+       return "Car cannot be null";
     }
 
-    public boolean unpark(int slotNo) {
+    public Car unpark(Object slotNo) {
+        if(!isCarParkedForDriveOut(slotNo))
+            throw new CarIsNotParkedToBeUnParkedException("Car is not parked for unparking");
+        Car car = slots.get(slotNo);
+        slots.remove(slotNo);
+        if((size-1) == slots.size())
+        {
+            owner.notifyParkingLotHasSpaceAgain();
+        }
+        return car;
+    }
+
+    private boolean isCarParkedForDriveOut(Object slotNo)
+    {
         if(!slots.containsKey(slotNo))
             return false;
         return true;
     }
 
-    public void add(ParkingLotManagers manager) {
-        parkingLotManagers.add(manager);
-    }
 }
