@@ -1,10 +1,9 @@
 package org.alekhyannikhil;
 
-public class ParkingLotOwner implements ParkingLotManagers{
-    private boolean parkingFull;
+public class ParkingLotOwner implements ParkingFullNotification,ParkingHasAEmptySlotNotification{
 
     public void notifyParkingFull() {
-        parkingFull = true;
+
     }
 
     public void notifyParkingLotHasSpaceAgain(){

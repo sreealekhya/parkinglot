@@ -1,11 +1,15 @@
 package org.alekhyannikhil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ParkingLot {
     private int size;
     private Map<Integer,Car> slots;
     private ParkingLotOwner owner;
+    private List<ParkingFullNotification> parkingFull = new ArrayList<ParkingFullNotification>();
+    private List<ParkingHasAEmptySlotNotification> parkingHasEmptySlot = new ArrayList<ParkingHasAEmptySlotNotification>();
 
     public ParkingLot(int size, Map slots, ParkingLotOwner owner) {
         this.size = size;
@@ -15,27 +19,26 @@ public class ParkingLot {
 
 
     public Object park(Car car)  {
-        if(car != null){
         if(slots.size()<size)
         {
             if(slots.containsValue(car))
                 throw new SameCarCannotBeParkedAgainException("Car Already Parked");
-            for(int i=1;i<=10;i++)
+            for(int i=1;i<=size;i++)
             {
                 if(!slots.containsKey(i))
                 {
                     slots.put(i,car);
                     if(size == slots.size())
                     {
-                            owner.notifyParkingFull();
+                        for(ParkingFullNotification parkingFullNotification : parkingFull){
+                            parkingFullNotification.notifyParkingFull();
+                        }
                     }
                     return i;
                 }
             }
         }
         throw new ParkingFullException("ParkingLot is Full");
-       }
-       return "Car cannot be null";
     }
 
     public Car unpark(Object slotNo) {
@@ -45,7 +48,9 @@ public class ParkingLot {
         slots.remove(slotNo);
         if((size-1) == slots.size())
         {
-            owner.notifyParkingLotHasSpaceAgain();
+            for(ParkingHasAEmptySlotNotification parkingHasAEmptySlotNotification : parkingHasEmptySlot){
+                parkingHasAEmptySlotNotification.notifyParkingLotHasSpaceAgain();
+            }
         }
         return car;
     }
@@ -57,4 +62,11 @@ public class ParkingLot {
         return true;
     }
 
+    public void subscriberForParkingFullNotification(ParkingFullNotification subscriber) {
+        parkingFull.add(subscriber);
+    }
+
+    public void subscriberForParkingHasAEmptySlot(ParkingHasAEmptySlotNotification subscriber) {
+        parkingHasEmptySlot.add(subscriber);
+    }
 }
